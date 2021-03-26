@@ -1,54 +1,43 @@
 package timzmei.CurrencyConverter.controller;
 
-import org.javamoney.moneta.Money;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import javax.money.Monetary;
-import javax.money.convert.CurrencyConversion;
-import javax.money.convert.ExchangeRateProvider;
-import javax.money.convert.MonetaryConversions;
-import javax.money.format.MonetaryAmountFormat;
-import javax.money.format.MonetaryFormats;
-import java.util.Locale;
-import java.util.Set;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+import timzmei.CurrencyConverter.api.request.ExchangeRequest;
+import timzmei.CurrencyConverter.api.request.StatsRequest;
+import timzmei.CurrencyConverter.api.response.ExchangeResponse;
+import timzmei.CurrencyConverter.service.ExchangeService;
+import timzmei.CurrencyConverter.service.StatsService;
 
 @RestController
+@Slf4j //сoздает private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(LogExample.class);
 public class Controller {
 
+    private final ExchangeService exchangeService;
+    private final StatsService statsService;
 
-    @Override
-    public String toString() {
-        final StringBuffer sb = new StringBuffer("Controller{");
-        sb.append('}');
-        return sb.toString();
+    @Autowired
+    public Controller(ExchangeService exchangeService, StatsService statsService) {
+        this.exchangeService = exchangeService;
+        this.statsService = statsService;
     }
 
     @PostMapping("/exchange")
-    public ResponseEntity exchange(){
+    public ResponseEntity<ExchangeResponse> exchange(@RequestBody ExchangeRequest exchangeRequest){
+        log.trace("/exchange");
 
-        MonetaryAmountFormat formatForRUS = MonetaryFormats.getAmountFormat(Locale.forLanguageTag("ru-RU"));
-
-        ExchangeRateProvider rateProvider = MonetaryConversions.getExchangeRateProvider( "IMF");
-        CurrencyConversion conversionToEUR = rateProvider.getCurrencyConversion("EUR");
-
-        Money amountInUSD = Money.of(300.00, "USD");
-        var convertedToEUR1 = amountInUSD.with(conversionToEUR);
-        System.out.println("300.00 USD converted to EUR = " + formatForRUS.format(convertedToEUR1) + " " + convertedToEUR1.getNumber());
-
-
-
-//        MonetaryAmountFormat formatForRUS = MonetaryFormats.getAmountFormat(Locale.forLanguageTag("ru-RU"));
-//
-//        ExchangeRateProvider rateProvider = MonetaryConversions.getExchangeRateProvider( "IMF");
-//        CurrencyConversion conversionToEUR = rateProvider.getCurrencyConversion("EUR");
-//
-//        Money amountInUSD = Money.of(300.00, "USD");
-//        var convertedToEUR1 = amountInUSD.with(conversionToEUR);
-//        System.out.println("300.00 USD converted to EUR = " + formatForRUS.format(convertedToEUR1) + " " + convertedToEUR1.getNumber());
-
+        return exchangeService.getExchange(exchangeRequest);
     }
 
+    @GetMapping("/stats")
+    public ResponseEntity stats(@RequestBody StatsRequest statsRequest) {
+
+        return statsService.getResponse(statsRequest);
+    }
 
 
 //    @PostMapping("/exchange")

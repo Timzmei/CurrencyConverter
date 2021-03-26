@@ -1,0 +1,1 @@
+create table request_exchange (id integer NOT NULL, id_user integer NOT NULL, from_currency varchar(255) NOT NULL, to_currency varchar(255) NOT NULL, from_value double NOT NULL, PRIMARY KEY (id));
